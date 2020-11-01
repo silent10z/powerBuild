@@ -40,12 +40,19 @@
         </div>
 
           <div class="col-md-10 mb-5 mb-md-0" data-aos="fade-up">
-            <form method="post" action="{% url 'join' %}">
-
-
-
-              <button class="btn btn-primary" > 가입하기 </button>
-            </form>
+            <form method="POST">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="username">사용자 이름 입력</label>
+                        <input type="text" class="form-control" id="username" name="username"  placeholder="사용자이름">
+                    </div>
+                    <div class="form-group">
+                        <label for="password">비밀번호 입력</label>
+                        <input type="password" class="form-control" id="password" name="password" placeholder="비밀번호">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </form>
+              <a href="{% url 'join' %}" class="btn btn-primary" > 회원가입</a>
           </div>
 
         </div>
