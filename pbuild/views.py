@@ -1,5 +1,8 @@
+from django.contrib.auth import authenticate
 from django.contrib.auth.hashers import check_password
+from django.http import HttpResponseRedirect
 from django.shortcuts import render, redirect
+from django.urls import reverse
 from django.views.generic import CreateView
 from django.contrib import messages
 
@@ -21,6 +24,9 @@ class Index(generic.TemplateView):
         messages.add_message(request, messages.INFO, 'Hello world.')
         return render(request, template_name, {"user_list": user_list})
 
+
+
+
 # blog 페이지
 class Blog(generic.TemplateView):
     def get(self, request):
@@ -41,7 +47,7 @@ class Feature(generic.TemplateView):
 # contact page
 class Contact(generic.TemplateView):
     def get(self,request):
-        template_name = 'main/contact.html'
+        template_name = 'main/detail.html'
         return render(request, template_name)
 
 class Pricing(generic.TemplateView):
@@ -67,27 +73,27 @@ class Pricing(generic.TemplateView):
 #         res_data['meassage2'] = "회원가입 완료"
 #         return render(request, template_name, res_data)
 # 로그인 뷰로 가기
-class LoginView(generic.TemplateView):
-    def get(self,request):
-        template_name = 'main/login.html'
-        return render(request, template_name)
+# class LoginView(generic.TemplateView):
+#     def get(self,request):
+#         template_name = 'main/login.html'
+#         return render(request, template_name)
 
 # 로그인 하기
-class UserLoginView(LoginView):
-    template_name = 'user/login.html'
-    success_url = "/"
-    def from_invalid(self, form):
-        messages.error(self.request, '로그인에 실패하였습니다', extra_tags='danger')
+# class UserLoginView(LoginView):
+#     template_name = 'user/login.html'
+#     success_url = "/"
+#     def from_invalid(self, form):
+#         messages.error(self.request, '로그인에 실패하였습니다', extra_tags='danger')
 
-# # 로그인 기능
+# 로그인 기능
 # def login(request):
-#     template_name = 'main/login.html'
+#     template_name = 'main/index.html'
 #     if request.method == "GET":
 #         return render(request, 'login.html')
 #     elif request.method == "POST":
-#         username = request.POST.get('name')
+#         username = request.POST.get('username')
 #         password = request.POST.get('password')
-#
+#         user = authenticate(username='john', password='secret')
 #         res_data = {}
 #         if not (username and password):
 #             res_data['error'] = "모든 칸을 다 입력해주세요"
@@ -101,3 +107,34 @@ class UserLoginView(LoginView):
 #         else:
 #             res_data['error'] = "비밀번호가 틀렸습니다."
 #     return render(request, template_name, res_data)
+
+def login(request):
+    res_data = {}
+    if request.method == "GET":
+        return render(request, 'main/login.html')
+    elif request.method == "POST":
+        id = request.POST.get('id')
+        password = request.POST.get('password')
+        if not (id and password):
+            res_data['error'] = '아이디와 비밀번호 모두 입력해주세요'
+        else:
+            puser = User.objects.get(id=id)
+
+            if puser.password == password:
+                request.session['user'] = puser.id
+
+                return redirect('/')
+            else:
+                res_data['error'] = '비밀번호가 틀렸습니다.'
+    return render(request, 'main/login.html', res_data)
+
+def logout(request):
+    if request.session['user']:
+        del(request.session['user'])
+    return redirect('/')
+
+
+class userDtail(generic.TemplateView):
+    def get(self, request):
+
+        return render(request,"user/detail.html")

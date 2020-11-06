@@ -1,6 +1,6 @@
 {% extends 'common/base.html' %}
 {% load static %}
-{% load bootstrap4 %}
+{% block title %}로그인 {% endblock title %}
 {% block main %}
     <section class="hero-section inner-page">
       <div class="wave">
@@ -34,25 +34,26 @@
         <div class="row mb-5 align-items-end">
           <div class="col-md-6" data-aos="fade-up">
 
-            <h2>Sign Form</h2>
+            <h2>Sign Form{{ error }}</h2>
           </div>
 
         </div>
 
           <div class="col-md-10 mb-5 mb-md-0" data-aos="fade-up">
-            <form method="POST">
+            <form method="post" action="{% url 'login' %}">
                     {% csrf_token %}
                     <div class="form-group">
-                        <label for="username">사용자 이름 입력</label>
-                        <input type="text" class="form-control" id="username" name="username"  placeholder="사용자이름">
+                        <label for="id">사용자 이름 입력</label>
+                        <input type="text" class="form-control" id="id" name="id"  placeholder="아이디">
                     </div>
                     <div class="form-group">
                         <label for="password">비밀번호 입력</label>
                         <input type="password" class="form-control" id="password" name="password" placeholder="비밀번호">
                     </div>
                     <button type="submit" class="btn btn-primary">Submit</button>
+                    <a href="{% url 'login' %}" class="btn btn-primary" > 회원가입</a>
                 </form>
-              <a href="{% url 'join' %}" class="btn btn-primary" > 회원가입</a>
+
           </div>
 
         </div>

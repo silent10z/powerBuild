@@ -10,5 +10,7 @@ urlpatterns = [
     path('features/', views.Feature.as_view(), name='features'),
     path('pricing/', views.Pricing.as_view(), name='pricing'),
     # path('join/', views.UserCreateView.as_view(), name="join"),
-    # path('login/', views.LoginView.as_view(), name="login")
+    path('login/', views.login, name="login"),
+    path('detail/', views.userDtail.as_view(), name="detail"),
+    path('logout/', views.logout, name="logout")
 ]
