@@ -34,7 +34,8 @@
         <div class="row mb-5 align-items-end">
           <div class="col-md-6" data-aos="fade-up">
 
-            <h2>Sign Form{{ error }}</h2>
+            <h2>Sign Form</h2>
+              <div style="color:'red'">{{ error }}</div>
           </div>
 
         </div>
@@ -51,7 +52,7 @@
                         <input type="password" class="form-control" id="password" name="password" placeholder="비밀번호">
                     </div>
                     <button type="submit" class="btn btn-primary">Submit</button>
-                    <a href="{% url 'login' %}" class="btn btn-primary" > 회원가입</a>
+                    <a href="{% url 'signup' %}" class="btn btn-primary" > 회원가입</a>
                 </form>
 
           </div>

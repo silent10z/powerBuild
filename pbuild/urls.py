@@ -12,5 +12,6 @@ urlpatterns = [
     # path('join/', views.UserCreateView.as_view(), name="join"),
     path('login/', views.login, name="login"),
     path('detail/', views.userDtail.as_view(), name="detail"),
-    path('logout/', views.logout, name="logout")
+    path('logout/', views.logout, name="logout"),
+    path('signup/', views.signup, name="signup")
 ]

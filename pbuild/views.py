@@ -5,6 +5,7 @@ from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.views.generic import CreateView
 from django.contrib import messages
+from .forms import SingUpForm
 
 from .models import User
 # Create your views here.
@@ -107,31 +108,63 @@ class Pricing(generic.TemplateView):
 #         else:
 #             res_data['error'] = "비밀번호가 틀렸습니다."
 #     return render(request, template_name, res_data)
-
+# 로그인
 def login(request):
+    # error 메세지 담을 변수
     res_data = {}
+    # get 방식으로 요청이 올 떄
     if request.method == "GET":
+        # login page로 보내줌
         return render(request, 'main/login.html')
+    # post 방식으로 요청이 올때
     elif request.method == "POST":
+        # 폼에서 전달받은 post 값 들 정의하기
         id = request.POST.get('id')
         password = request.POST.get('password')
+
         if not (id and password):
             res_data['error'] = '아이디와 비밀번호 모두 입력해주세요'
         else:
-            puser = User.objects.get(id=id)
+            try:
+                puser = User.objects.get(id=id)
+                if puser.password == password:
+                    request.session['user'] = puser.id
 
-            if puser.password == password:
-                request.session['user'] = puser.id
+                    return redirect('/')
+                else:
+                    res_data['error'] = '비밀번호가 틀렸습니다.'
+            except:
+                    res_data['error'] = '아이디가 존재하지 않습니다'
+        return render(request, 'main/login.html', res_data)
 
-                return redirect('/')
-            else:
-                res_data['error'] = '비밀번호가 틀렸습니다.'
-    return render(request, 'main/login.html', res_data)
-
+# 로그아웃
 def logout(request):
     if request.session['user']:
         del(request.session['user'])
     return redirect('/')
+
+# 회원 가입
+
+def signup(request):
+    if request.method == "GET":
+        form = SingUpForm()
+        return render(request, 'insertForm/signup.html', {'form': form })
+    elif request.method == "POST":
+        form = SingUpForm(request.POST)
+
+        if form.is_valid():
+            form.save()
+            id = form.cleaned_data['id']
+            password = form.cleaned_data['password']
+            puser = User.objects.get(id=id)
+            print(puser)
+            if puser is not None and puser.password == password:
+                request.session['user'] = puser.id
+
+                return redirect('/')
+
+        return render(request, 'main/login.html')
+
 
 
 class userDtail(generic.TemplateView):
