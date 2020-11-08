@@ -41,6 +41,7 @@ INSTALLED_APPS = [
         'pbuild',
         'bootstrap4',
         'django.contrib.admin',
+        'widget_tweaks',
 ]
 
 MIDDLEWARE = [

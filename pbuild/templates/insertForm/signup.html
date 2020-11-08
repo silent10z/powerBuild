@@ -1,7 +1,9 @@
 {% extends 'common/base.html' %}
 {% load static %}
+{% load widget_tweaks %}
 {% block title %} 회원가입 {% endblock title %}
 {% block main %}
+
     <section class="hero-section inner-page">
       <div class="wave">
 
@@ -33,30 +35,41 @@
       <div class="container">
         <div class="row mb-5 align-items-end">
           <div class="col-md-6" data-aos="fade-up">
-
-            <h2>Sign Form</h2>
+              <h2>Sign Form</h2>
               <div style="color:'red'">{{ error }}</div>
           </div>
-
         </div>
+      <div class="col-md-10 mb-5 mb-md-0" data-aos="fade-up">
+        <div class="signup">
+            <form method="post">
+                {% csrf_token %}
 
-          <div class="col-md-10 mb-5 mb-md-0" data-aos="fade-up">
-            <form method="post" action="{% url 'signup' %}">
-                    {% csrf_token %}
-                    {% for field in form %}
-                    <div class="fieldWrapper">
-                    {{ field.errors }}
-                    {{ field.label_tag }} {{ field }}
+                {{ form.non_field_errors }}
+                {% for hidden_field in form.hidden_fields %}
+                    {{ hidden_field.errors }}
+                    {{ hidden_field }}
+                {% endfor %}
+                <table border="1">
+                    {% for field in form.visible_fields %}
+                    <tr>
+                        <th>{{ field.label_tag }}</th>
 
-                    </div>
+                        <td>
+                            {{ field.errors }}
+                            {{ field }}
+                            {{ field.help_text }}
+                        </td>
+                     </tr>
                     {% endfor %}
-                    <input type="submit" value="제출">
-                </form>
-            <a href="{% url 'index' %}">메인으로가기</a>
-          </div>
+                </table>
+                <button type="submit" class="btn btn-info">제출</button>
+                <a href="{% url 'index' %}" class="btn btn-primary">메인</a>
+            </form>
 
-        </div>
+          </div>
       </div>
+
+
     </section>
 <main id="main">
 

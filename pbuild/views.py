@@ -1,6 +1,6 @@
 from django.contrib.auth import authenticate
 from django.contrib.auth.hashers import check_password
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponseNotFound, HttpResponse
 from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.views.generic import CreateView
@@ -146,25 +146,28 @@ def logout(request):
 # 회원 가입
 
 def signup(request):
-    if request.method == "GET":
-        form = SingUpForm()
-        return render(request, 'insertForm/signup.html', {'form': form })
-    elif request.method == "POST":
+    # if request.method == "GET":
+    #     signup_form = SingUpForm()
+    #     return render(request, 'insertForm/signup.html', {'signup_form': signup_form })
+    if request.method == "POST":
         form = SingUpForm(request.POST)
-
+        print("is_valid :", form.is_valid())
         if form.is_valid():
             form.save()
-            id = form.cleaned_data['id']
-            password = form.cleaned_data['password']
-            puser = User.objects.get(id=id)
-            print(puser)
-            if puser is not None and puser.password == password:
-                request.session['user'] = puser.id
+            return redirect("index")
+            # form.save()
+            #
+            # password = form.cleaned_data['password']
+            # puser = User.objects.get(id=id)
+            # print(puser)
+            # if puser is not None and puser.password == password:
+            #     request.session['user'] = puser.id
+            #
+            #     return redirect('/')
 
-                return redirect('/')
-
-        return render(request, 'main/login.html')
-
+    else:
+        form = SingUpForm()
+    return render(request, 'insertForm/signup.html', {'form': form})
 
 
 class userDtail(generic.TemplateView):
