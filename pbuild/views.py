@@ -1,19 +1,8 @@
-from django.contrib.auth import authenticate
-from django.contrib.auth.hashers import check_password
-from django.http import HttpResponseRedirect, HttpResponseNotFound, HttpResponse
-from django.shortcuts import render, redirect
-from django.urls import reverse
-from django.views.generic import CreateView
+from django.http import HttpResponseRedirect, HttpResponseNotFound, HttpResponse, Http404
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from .forms import SingUpForm
-
 from .models import User
-# Create your views here.
-
-# 함수 형식
-
-# 제내릭 뷰 형식
-
 from django.views import generic
 
 # index 페이지
@@ -21,7 +10,6 @@ class Index(generic.TemplateView):
     def get(self, request, *args, **kwargs):
         template_name = 'main/index.html'
         user_list = User.objects.all()
-        print(user_list)
         messages.add_message(request, messages.INFO, 'Hello world.')
         return render(request, template_name, {"user_list": user_list})
 
@@ -56,58 +44,6 @@ class Pricing(generic.TemplateView):
         template_name = 'main/pricing.html'
         return render(request, template_name)
 
-# 회원가입 폼
-# from .forms import UserForm
-# class UserCreateView(CreateView):
-#     form_class = UserForm
-#     template_name = 'insertForm/signup.html'
-#     success_url = "/"
-#
-#     def post(self, request):
-#         super(UserCreateView, self).post(request)
-#         id = request.POST['id']
-#         password = request.POST['password']
-#         print("아이디와 페스워드", [id, password])
-#         messages2 = {"회원가입 완료"}
-#         template_name = 'main/index.html'
-#         res_data = {}
-#         res_data['meassage2'] = "회원가입 완료"
-#         return render(request, template_name, res_data)
-# 로그인 뷰로 가기
-# class LoginView(generic.TemplateView):
-#     def get(self,request):
-#         template_name = 'main/login.html'
-#         return render(request, template_name)
-
-# 로그인 하기
-# class UserLoginView(LoginView):
-#     template_name = 'user/login.html'
-#     success_url = "/"
-#     def from_invalid(self, form):
-#         messages.error(self.request, '로그인에 실패하였습니다', extra_tags='danger')
-
-# 로그인 기능
-# def login(request):
-#     template_name = 'main/index.html'
-#     if request.method == "GET":
-#         return render(request, 'login.html')
-#     elif request.method == "POST":
-#         username = request.POST.get('username')
-#         password = request.POST.get('password')
-#         user = authenticate(username='john', password='secret')
-#         res_data = {}
-#         if not (username and password):
-#             res_data['error'] = "모든 칸을 다 입력해주세요"
-#         else:
-#             fuser = User.objects.get(name = username)
-#
-#         if check_password(password, fuser.password):
-#             request.session['user']= fuser.id
-#
-#             return redirect('/')
-#         else:
-#             res_data['error'] = "비밀번호가 틀렸습니다."
-#     return render(request, template_name, res_data)
 # 로그인
 def login(request):
     # error 메세지 담을 변수
@@ -124,53 +60,58 @@ def login(request):
 
         if not (id and password):
             res_data['error'] = '아이디와 비밀번호 모두 입력해주세요'
+        elif not User.objects.filter(id =id).exists():
+            res_data['error'] = '아이디가 존재하지 않습니다'
         else:
-            try:
-                puser = User.objects.get(id=id)
-                if puser.password == password:
-                    request.session['user'] = puser.id
+            puser = User.objects.get(id=id)
 
-                    return redirect('/')
-                else:
-                    res_data['error'] = '비밀번호가 틀렸습니다.'
-            except:
-                    res_data['error'] = '아이디가 존재하지 않습니다'
+            if puser.password == password:
+                request.session['id'] = puser.id
+                request.session['user_number'] = puser.user_number
+                print("새션값",request.session['id'] ,  request.session['user_number'])
+                return redirect('/')
+            else:
+                res_data['error'] = '비밀번호가 틀렸습니다.'
+
+
         return render(request, 'main/login.html', res_data)
 
 # 로그아웃
 def logout(request):
-    if request.session['user']:
-        del(request.session['user'])
-    return redirect('/')
+    try:
+        if request.session['id']:
+            del(request.session['id'], request.session['user_number'])
+        return redirect('/')
+    except HttpResponseNotFound:
+        raise HttpResponseNotFound("error404")
 
 # 회원 가입
 
 def signup(request):
-    # if request.method == "GET":
-    #     signup_form = SingUpForm()
-    #     return render(request, 'insertForm/signup.html', {'signup_form': signup_form })
-    if request.method == "POST":
-        form = SingUpForm(request.POST)
-        print("is_valid :", form.is_valid())
-        if form.is_valid():
-            form.save()
-            return redirect("index")
-            # form.save()
-            #
-            # password = form.cleaned_data['password']
-            # puser = User.objects.get(id=id)
-            # print(puser)
-            # if puser is not None and puser.password == password:
-            #     request.session['user'] = puser.id
-            #
-            #     return redirect('/')
+    try:
+        if request.method == "POST":
+            form = SingUpForm(request.POST)
+            print("form.is_valid():", form.is_valid())
+            if form.is_valid():
 
-    else:
-        form = SingUpForm()
-    return render(request, 'insertForm/signup.html', {'form': form})
+                form.save()
 
+                request.session['id'] = form.id
+                return redirect("index")
+            else:
+                print(form.errors)
+        else:
+            form = SingUpForm()
+        return render(request, 'insertForm/signup.html', {'form': form})
+    except HttpResponseNotFound:
+        raise  Http404("404 error")
 
-class userDtail(generic.TemplateView):
-    def get(self, request):
+# 티테일 화면으로 가기
+class userDtail(generic.DetailView):
+    model = User
 
-        return render(request,"user/detail.html")
+    def get(self, request, user_number):
+        print(request.session['id'], request.session['user_number'])
+        user = get_object_or_404(User, pk=user_number)
+        print(user)
+        return render(request,"user/detail.html", {"user" : user})

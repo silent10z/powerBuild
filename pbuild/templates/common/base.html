@@ -72,9 +72,14 @@
                 </ul>
               </li>
               <li><a href="{% url 'contact' %}" class="nav-link">연결</a></li>
-              {% if request.session.user != None %}
-              <li><a href="{% url 'detail' %}" class="nav-link">{{ request.session.user }}</a></li>
-              <li><a href="{% url 'logout' %}" class="nav-link">로그아웃</a></li>
+              {% if request.session.id != None %}
+              <li class="has-children">
+              <a href="{% url 'detail' request.session.user_number %}" class="nav-link">{{ request.session.id }}</a>
+              <ul class="dropdown">
+                <li><a href="{% url 'detail' request.session.user_number %}" class="nav-link">{{ request.session.id }}</a></li>
+                <li><a href="{% url 'logout' %}" class="nav-link">로그아웃</a></li>
+              </ul>
+              </li>
               {% else %}
               <li><a href="{% url 'login' %}" class="nav-link">로그인</a></li>
 

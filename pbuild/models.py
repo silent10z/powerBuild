@@ -1,11 +1,6 @@
 from django.core import validators
 from django.db import models
 
-#
-# class TimeStamedModel(models.Model):
-#     create_at = models.DateTimeField(auto_now_add=True, verbose_name="가입날짜")
-#     update_at = models.DateTimeField(auto_now_add=True, verbose_name="수정날짜")
-
 
 class User(models.Model):
     GENDER_CHOICE = [
@@ -42,6 +37,7 @@ class User(models.Model):
 
     def __str__(self):
         return self.id
+
 
 class Meta:
     managed = False
